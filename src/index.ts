@@ -44,6 +44,7 @@ import {
 } from './db.js';
 import { GroupQueue } from './group-queue.js';
 import { resolveGroupFolderPath } from './group-folder.js';
+import { snapshotBrain, checkMemoryAndRepair, getSessionWithRotation } from './memory-monitor.js';
 import { startIpcWatcher } from './ipc.js';
 import { findChannel, formatMessages, formatOutbound } from './router.js';
 import {
@@ -208,6 +209,10 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     }, IDLE_TIMEOUT);
   };
 
+  // Snapshot brain/ before agent runs (for memory miss detection)
+  const brainDir = path.join(resolveGroupFolderPath(group.folder), 'brain');
+  const brainBeforeSnapshot = snapshotBrain(brainDir);
+
   await channel.setTyping?.(chatJid, true);
   let hadError = false;
   let outputSentToUser = false;
@@ -262,6 +267,9 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     return false;
   }
 
+  // Check if brain/ was updated — if not, spawn a memory writer to fix it
+  checkMemoryAndRepair(group, missedMessages.length, brainBeforeSnapshot, missedMessages);
+
   return true;
 }
 
@@ -272,7 +280,7 @@ async function runAgent(
   onOutput?: (output: ContainerOutput) => Promise<void>,
 ): Promise<'success' | 'error'> {
   const isMain = group.isMain === true;
-  const sessionId = sessions[group.folder];
+  const sessionId = getSessionWithRotation(group.folder, sessions[group.folder]);
 
   // Update tasks snapshot for container to read (filtered by group)
   const tasks = getAllTasks();

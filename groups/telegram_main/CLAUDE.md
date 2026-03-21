@@ -40,28 +40,45 @@
 
 ---
 
-## 自動記憶規則（必須執行）
+## 自動記憶規則（必須執行 — 邊做邊記）
 
-**每次對話結束前，你必須：**
+**核心原則：每次完成一個重要行動後立即更新記憶，唔好等到對話結尾。**
+長對話會超出 context 限制，如果你等到最後先更新，好大機會更新唔到。所以：做完一件事 → 即刻寫入記憶 → 再做下一件事。
 
-### 0. 更新 Tasks.md（最重要）
-每次對話後檢查 `/workspace/group/brain/Tasks.md`：
+### 優先級排序（由高到低）
+
+#### 🔴 P0 — Tasks.md（一定要更新，冇例外）
+每次完成任何行動後，立即檢查 `/workspace/group/brain/Tasks.md`：
 - 有新任務 → 加入對應優先級區塊
 - 任務完成 → `- [ ]` 改為 `- [x]` 並移到「完成」區
 - 任務擱置 → 改為 `- [-]` 加備註原因
 - 更新 `updated:` 日期
+- **即使你只能做一次記憶更新，都一定係呢個**
 
-### 1. 更新相關 Project 檔案
+#### 🟡 P1 — 相關 Project 檔案
 如果對話涉及某個項目，在對應的 `/workspace/group/brain/Projects/` 檔案加入進度記錄：
 ```markdown
 ## 進度記錄
 - YYYY-MM-DD [重點行動/決定/進展]
 ```
 
-### 2. 更新相關 People 檔案
+#### 🟡 P1 — 相關 People 檔案
 如果提到某個人物有新進展，更新 `/workspace/group/brain/People/` 對應檔案。
 
-### 3. 記錄今日行動
+#### 🟠 P2 — 重要決定另立檔案
+如果 Cho 做了一個重要決定，在 `/workspace/group/brain/Decisions/` 建立記錄：
+```markdown
+---
+tags: [decision, #相關tag]
+date: YYYY-MM-DD
+---
+# [決定標題]
+**決定**：...
+**原因**：...
+**下一步**：...
+```
+
+#### 🟢 P3 — 今日行動記錄（最低優先）
 在 `/workspace/group/brain/Daily/YYYY-MM-DD.md` 追加今日行動（如檔案不存在則建立）：
 ```markdown
 ---
@@ -75,18 +92,11 @@ date: YYYY-MM-DD
 - [待跟進]
 ```
 
-### 4. 重要決定另立檔案
-如果 Cho 做了一個重要決定，在 `/workspace/group/brain/Decisions/` 建立記錄：
-```markdown
----
-tags: [decision, #相關tag]
-date: YYYY-MM-DD
----
-# [決定標題]
-**決定**：...
-**原因**：...
-**下一步**：...
-```
+### Context 不足時的應變策略
+如果你發現對話已經好長（大量 tool call、多個來回），你可能快到 context 極限：
+1. **立即暫停當前工作**，優先更新 Tasks.md（P0）
+2. 如果仲有餘量，更新 Project / People 檔案（P1）
+3. P2、P3 可以跳過 — 寧願少記低優先級資訊，都唔好漏咗 Tasks.md
 
 ### 重要
 - 更新記憶是靜默操作，**唔需要告訴 Cho** 你做緊記憶更新
