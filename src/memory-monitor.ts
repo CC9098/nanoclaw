@@ -147,7 +147,11 @@ async function runMemoryWriter(
   );
 
   const groupDir = resolveGroupFolderPath(group.folder);
-  const pendingFile = path.join(groupDir, 'conversations', '_pending-memory.md');
+  const pendingFile = path.join(
+    groupDir,
+    'conversations',
+    '_pending-memory.md',
+  );
 
   try {
     await runContainerAgent(
@@ -229,7 +233,10 @@ export function checkMemoryAndRepair(
 
   runMemoryWriter(group, transcriptContainerPath)
     .catch((err) => {
-      logger.error({ err, group: group.name }, 'Memory writer unexpected error');
+      logger.error(
+        { err, group: group.name },
+        'Memory writer unexpected error',
+      );
     })
     .finally(() => {
       activeMemoryWriters.delete(group.name);
@@ -268,7 +275,7 @@ export function getSessionWithRotation(
     logger.info(
       {
         group: groupFolder,
-        elapsedHours: Math.round(elapsed / (60 * 60 * 1000) * 10) / 10,
+        elapsedHours: Math.round((elapsed / (60 * 60 * 1000)) * 10) / 10,
         intervalHours: SESSION_ROTATION_INTERVAL / (60 * 60 * 1000),
       },
       'Session rotation — starting fresh session (brain/ provides long-term memory)',
